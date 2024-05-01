@@ -64,6 +64,7 @@ func parseFlags(o *plugin.Options) (*source, []string, error) {
 	flagContentions := flag.Bool("contentions", false, "Display number of delays at each region")
 	flagMeanDelay := flag.Bool("mean_delay", false, "Display mean delay at each region")
 	flagTools := flag.String("tools", os.Getenv("PPROF_TOOLS"), "Path for object tool pathnames")
+	flagBaseSampleIndex := flag.String("base_sample_index", "", "sample index of a base metric to divide samples by")
 
 	flagHTTP := flag.String("http", "", "Present interactive web UI at the specified http host:port")
 	flagNoBrowser := flag.Bool("no_browser", false, "Skip opening a browser for the interactive web UI")
@@ -133,6 +134,10 @@ func parseFlags(o *plugin.Options) (*source, []string, error) {
 
 	if *flagMeanDelay {
 		cfg.Mean = true
+	}
+	if *flagBaseSampleIndex != "" {
+		cfg.BaseSampleIndex = *flagBaseSampleIndex
+
 	}
 
 	source := &source{

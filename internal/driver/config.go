@@ -26,6 +26,7 @@ type config struct {
 	IntelSyntax         bool    `json:"intel_syntax,omitempty"`
 	Mean                bool    `json:"mean,omitempty"`
 	SampleIndex         string  `json:"-"`
+	BaseSampleIndex     string  `json:"-"`
 	DivideBy            float64 `json:"-"`
 	Normalize           bool    `json:"normalize,omitempty"`
 	Sort                string  `json:"sort,omitempty"`

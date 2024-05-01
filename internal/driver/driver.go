@@ -281,7 +281,7 @@ func aggregate(prof *profile.Profile, cfg config) error {
 
 func reportOptions(p *profile.Profile, numLabelUnits map[string]string, cfg config) (*report.Options, error) {
 	si, mean := cfg.SampleIndex, cfg.Mean
-	value, meanDiv, sample, err := sampleFormat(p, si, mean)
+	value, meanDiv, sample, err := sampleFormat(p, si, mean, cfg.BaseSampleIndex)
 	if err != nil {
 		return nil, err
 	}
@@ -363,7 +363,7 @@ type sampleValueFunc func([]int64) int64
 
 // sampleFormat returns a function to extract values out of a profile.Sample,
 // and the type/units of those values.
-func sampleFormat(p *profile.Profile, sampleIndex string, mean bool) (value, meanDiv sampleValueFunc, v *profile.ValueType, err error) {
+func sampleFormat(p *profile.Profile, sampleIndex string, mean bool, baseSampleIndex string) (value, meanDiv sampleValueFunc, v *profile.ValueType, err error) {
 	if len(p.SampleType) == 0 {
 		return nil, nil, nil, fmt.Errorf("profile has no samples")
 	}
@@ -375,6 +375,15 @@ func sampleFormat(p *profile.Profile, sampleIndex string, mean bool) (value, mea
 	if mean {
 		meanDiv = valueExtractor(0)
 	}
+
+	if baseSampleIndex != "" {
+		b, err := p.SampleIndexByName(baseSampleIndex)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		meanDiv = valueExtractor(b)
+	}
+
 	v = p.SampleType[index]
 	return
 }

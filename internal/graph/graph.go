@@ -644,6 +644,14 @@ func (ns Nodes) Sum() (flat int64, cum int64) {
 	return
 }
 
+func (ns Nodes) SumDiv() (flatDiv int64, cumDiv int64) {
+	for _, n := range ns {
+		flatDiv += n.FlatDiv
+		cumDiv += n.CumDiv
+	}
+	return
+}
+
 func (n *Node) addSample(dw, w int64, labels string, numLabel map[string][]int64, numUnit map[string][]string, format func(int64, string) string, flat bool) {
 	// Update sample value
 	if flat {

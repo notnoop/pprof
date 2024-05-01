@@ -115,7 +115,19 @@ func printSource(w io.Writer, rpt *Report) error {
 			}
 
 			for _, fn := range fnodes {
-				fmt.Fprintf(w, "%10s %10s %6d:%s\n", valueOrDot(fn.Flat, rpt), valueOrDot(fn.Cum, rpt), fn.Info.Lineno, fn.Info.Name)
+				var flatStr, cumStr string
+				if fn.Flat > 0 && fn.FlatDiv > 0 {
+					flatStr = measurement.Percentage(fn.Flat, fn.FlatDiv)
+				} else {
+					flatStr = valueOrDot(fn.Flat, rpt)
+				}
+				if fn.Cum > 0 && fn.CumDiv > 0 {
+					cumStr = measurement.Percentage(fn.Cum, fn.CumDiv)
+				} else {
+					cumStr = valueOrDot(fn.Cum, rpt)
+				}
+
+				fmt.Fprintf(w, "%10s %10s %6d:%s\n", flatStr, cumStr, fn.Info.Lineno, fn.Info.Name)
 			}
 		}
 	}
@@ -926,13 +938,16 @@ func getSourceFromFile(file string, reader *sourceReader, fns graph.Nodes, start
 			break
 		}
 		flat, cum := lineNodes[lineno].Sum()
+		flatDiv, cumDiv := lineNodes[lineno].SumDiv()
 		src = append(src, &graph.Node{
 			Info: graph.NodeInfo{
 				Name:   strings.TrimRight(line, "\n"),
 				Lineno: lineno,
 			},
-			Flat: flat,
-			Cum:  cum,
+			Flat:    flat,
+			FlatDiv: flatDiv,
+			Cum:     cum,
+			CumDiv:  cumDiv,
 		})
 	}
 	if err := reader.fileError(file); err != nil {
